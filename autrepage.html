@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Panneau VHS Matrix</title>
+
+<style>
+@font-face {
+  font-family: "VCR OSD Mono";
+  src: url("//works.rocheclement.fr/portraitchinois/fonts/VCR.ttf");
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+  font-family:"VCR OSD Mono", monospace;
+  background:black;
+  color:#00ff00;
+  overflow:hidden;
+  background-image:url("https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExN3F1cXdhd3lqNmd4ZDczenQ3N3VwZHp0a3Q4dXo2dm5iM2NxdGsxcCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/TmMqjvmDTUV3V6tdrp/giphy.gif");
+  background-size:cover;
+  background-position:center;
+  text-shadow:0 0 5px #00ff00;
+}
+
+/* VHS scanlines */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:repeating-linear-gradient(
+    to bottom,
+    rgba(0,0,0,.4) 0px,
+    rgba(0,0,0,.4) 1px,
+    rgba(255,255,255,.03) 2px,
+    transparent 4px
+  );
+  pointer-events:none;
+  animation:scan 0.15s infinite;
+}
+@keyframes scan{
+  0%{transform:translateY(0)}
+  50%{transform:translateY(-1px)}
+}
+
+/* REC */
+.rec{
+  position:fixed;
+  top:20px;
+  left:20px;
+  color:red;
+  font-size:20px;
+  animation:blink 1s infinite;
+}
+@keyframes blink{
+  0%,50%{opacity:1}
+  51%,100%{opacity:0}
+}
+
+/* Menu container */
+.container{
+  background:rgba(0,0,0,.85);
+  border:2px solid #00ff00;
+  padding:25px;
+  border-radius:10px;
+  width:420px;
+  margin:auto;
+  margin-top:10vh;
+  display:none;
+  max-height:80vh;
+  overflow-y:auto;
+}
+
+h1{text-align:center;margin-bottom:20px}
+
+.btn{
+  width:100%;
+  padding:12px;
+  margin:6px 0;
+  border:2px solid #00ff00;
+  background:black;
+  color:#00ff00;
+  cursor:pointer;
+  font-family:"VCR OSD Mono", monospace;
+  font-size:14px;
+}
+.btn:hover{
+  background:#00ff00;
+  color:black;
+}
+
+/* Bouton Play/Pause */
+.play{
+  position:fixed;
+  bottom:30px;
+  right:30px;
+  width:70px;
+  height:70px;
+  border-radius:50%;
+  border:2px solid red;
+  background:black;
+  color:red;
+  font-size:30px;
+  cursor:pointer;
+}
+
+/* Paramètres */
+.settings{
+  position:fixed;
+  top:20px;
+  right:20px;
+  background:rgba(0,0,0,0.7);
+  color:#00ff00;
+  border:2px solid #00ff00;
+  padding:10px;
+  border-radius:8px;
+  font-size:14px;
+  display:none;
+}
+.settings label{
+  display:block;
+  margin:5px 0;
+}
+
+/* Pause text */
+#pauseText{
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  color:red;
+  font-size:50px;
+  font-family:"VCR OSD Mono";
+  display:none;
+  z-index:999;
+  text-shadow:0 0 10px red;
+}
+</style>
+</head>
+
+<body>
+
+<audio id="bgMusic" src="https://digipad.s3.sbg.io.cloud.ovh.net/1578621/acido-iii-super-slowed_o9kg2bqv6rk.mp3" loop preload="auto"></audio>
+
+<div class="rec">● REC</div>
+
+<!-- Bouton Play/Pause -->
+<button class="play" onclick="toggleMenu()">▶</button>
+
+<!-- Bouton Paramètres -->
+<button class="play" style="top:100px; right:30px;" onclick="toggleSettings()">⚙</button>
+
+<!-- Pause text -->
+<div id="pauseText">PAUSE</div>
+
+<!-- Menu principal -->
+<div class="container" id="menu">
+<h1>🎮 JEUX VIDÉO</h1>
+
+<button class="btn" onclick="toggleGames()">🎮 Jeux</button>
+<div id="games" style="display:none">
+  <button class="btn" onclick="openGame('https://store.steampowered.com/tags/fr/Horreur/')">Jeux d'Horreur</button>
+  <button class="btn" onclick="openGame('https://www.roblox.com')">Roblox</button>
+</div>
+
+<button class="btn" onclick="toggleScripts()">🟢 Script.bat</button>
+<div id="scripts" style="display:none">
+  <button class="btn" onclick="openScript('https://upnow-prod.ff45e40d1a1c8f7e7de4e976d0c9e555.r2.cloudflarestorage.com/AqA0syGGp6a8GMxSGimLY3jQXyq2/cb61e77e-5cd7-4a84-8b38-3b0e6e4fd2d4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=2f488bd324502ec20fee5b40e9c9ed39%2F20260127%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260127T121514Z&X-Amz-Expires=43200&X-Amz-Signature=5cbd11ae9ebf3799fda6d3207b909819d9129b36403ffc65bc9e0d207ecdd775&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3D%22administrateur%20windows.bat%22')">📺 admin.bat</button>
+  <button class="btn" onclick="openScript('https://upnow-prod.ff45e40d1a1c8f7e7de4e976d0c9e555.r2.cloudflarestorage.com/AqA0syGGp6a8GMxSGimLY3jQXyq2/27b35541-a30a-4f8b-8fde-1974f577168e?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=2f488bd324502ec20fee5b40e9c9ed39%2F20260127%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260127T121743Z&X-Amz-Expires=43200&X-Amz-Signature=529e508fea4a93758df3f08744a3351a41ac611b4fdc54a3b845330943e5a8b6&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3D%22fond%20d%27ecrant2.bat%22')">🔍 fond d'ecrant.bat</button>
+  <button class="btn" onclick="openScript('https://upnow-prod.ff45e40d1a1c8f7e7de4e976d0c9e555.r2.cloudflarestorage.com/AqA0syGGp6a8GMxSGimLY3jQXyq2/188bdec8-696b-4902-8f2a-49bb8f1a6086?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=2f488bd324502ec20fee5b40e9c9ed39%2F20260127%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260127T121859Z&X-Amz-Expires=43200&X-Amz-Signature=c94891ea05b71accfdd029a85954cb125285d88c1b95844964925e7c3319421e&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3D%22script%20pour%20cree%20un%20dossier.bat%22')">💻 creation d'un dossier.bat</button>
+  <button class="btn" onclick="openScript('https://upnow-prod.ff45e40d1a1c8f7e7de4e976d0c9e555.r2.cloudflarestorage.com/AqA0syGGp6a8GMxSGimLY3jQXyq2/bb4fa383-c54d-4241-b19c-eccfc72f6cbd?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=2f488bd324502ec20fee5b40e9c9ed39%2F20260127%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260127T122011Z&X-Amz-Expires=43200&X-Amz-Signature=09a5fa144f9629e305fa1f9e4acdc8b1b84d54ac3a24fa6ff8aa9bbee2151044&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3D%22me.bat%22')">🎮 copie de usb en usb.bat</button>
+  <button class="btn" onclick="openScript('https://upnow-prod.ff45e40d1a1c8f7e7de4e976d0c9e555.r2.cloudflarestorage.com/AqA0syGGp6a8GMxSGimLY3jQXyq2/672fdcf9-d244-4f47-97ab-b414e51c0347?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=2f488bd324502ec20fee5b40e9c9ed39%2F20260127%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260127T122212Z&X-Amz-Expires=43200&X-Amz-Signature=b66ed4294a6a995d79935f17d0aa6f2f49e3c004c29eaf5993f8e48a7f3329d7&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3D%22securiter.bat%22')">💬 securiter.ba</button>
+  <button class="btn" onclick="downloadMatrix()">🟢 Matrix.bat</button>
+</div>
+
+<!-- Boutons HTML supplémentaires -->
+<button class="btn" onclick="toggleHTML()">📄 Fichiers HTML</button>
+<div id="htmlFiles" style="display:none">
+  <button class="btn" onclick="openHTML('lol.html')">📄 LOL</button>
+  <button class="btn" onclick="openHTML('lil.html')">📄 LIL</button>
+  <button class="btn" onclick="openHTML('Bouton racourci.html')">📄 bouton racourcie</button>
+  <button class="btn" onclick="openHTML('San.html')">📄 ia</button>
+</div>
+</div>
+
+<!-- Paramètres -->
+<div class="settings" id="settingsPanel">
+  <label>Volume musique: <input type="range" id="volume" min="0" max="1" step="0.05" value="0.4" onchange="setVolume(this.value)"></label>
+  <label>Vitesse scanlines: <input type="range" id="scanSpeed" min="0.05" max="1" step="0.05" value="0.15" onchange="setScanSpeed(this.value)"></label>
+  <label>Couleur texte: <input type="color" id="textColor" value="#00ff00" onchange="setTextColor(this.value)"></label>
+  <label>Opacité menu: <input type="range" id="menuOpacity" min="0.1" max="1" step="0.05" value="0.85" onchange="setMenuOpacity(this.value)"></label>
+</div>
+
+<script>
+let isPlaying = false;
+
+// Son au clic
+const clickSound = new Audio('');
+function playClickSound(){ 
+  clickSound.currentTime = 0;
+  clickSound.play().catch(e=>{}); 
+}
+
+// Toggle Menu + Play/Pause
+function toggleMenu(){
+  playClickSound();
+  const menu = document.getElementById('menu');
+  const btn = document.querySelector('.play');
+  const audio = document.getElementById('bgMusic');
+  const pauseText = document.getElementById('pauseText');
+
+  if(!isPlaying){
+    menu.style.display = "block";
+    btn.textContent = "⏸";
+    audio.play();
+    pauseText.style.display = "none";
+    isPlaying = true;
+  } else {
+    menu.style.display = "none";
+    btn.textContent = "▶";
+    audio.pause();
+    pauseText.style.display = "block";
+    setTimeout(()=>pauseText.style.display="none",2000);
+    isPlaying = false;
+  }
+}
+
+// Toggle Jeux
+function toggleGames(){
+  playClickSound();
+  const games = document.getElementById('games');
+  games.style.display = games.style.display==="none"?"block":"none";
+}
+
+// Toggle Scripts
+function toggleScripts(){
+  playClickSound();
+  const scripts = document.getElementById('scripts');
+  scripts.style.display = scripts.style.display==="none"?"block":"none";
+}
+
+// Toggle HTML Files
+function toggleHTML(){
+  playClickSound();
+  const htmlFiles = document.getElementById('htmlFiles');
+  htmlFiles.style.display = htmlFiles.style.display==="none"?"block":"none";
+}
+
+// Toggle Paramètres
+function toggleSettings(){
+  playClickSound();
+  const settings = document.getElementById('settingsPanel');
+  settings.style.display = settings.style.display==="none"?"block":"none";
+}
+
+// Ouvrir liens
+function openGame(url){
+  playClickSound();
+  window.open(url,"_blank");
+}
+
+// Ouvrir scripts
+function openScript(url){
+  playClickSound();
+  window.open(url,"_blank");
+}
+
+// Ouvrir fichiers HTML - CORRECTION ICI
+function openHTML(file){
+  playClickSound();
+  window.open("html/" + file,"_blank");
+}
+
+// Télécharger MATRIX.bat
+function downloadMatrix(){
+  playClickSound();
+  const content = `@echo off
+title MATRIX ACCESS
+color 0A
+mode con cols=120 lines=40
+echo INITIALISATION...
+timeout /t 1 >nul
+echo CONNEXION AU MAINFRAME...
+timeout /t 1 >nul
+echo BYPASS FIREWALL...
+timeout /t 1 >nul
+echo ACCES AUTORISE
+timeout /t 1 >nul
+cls
+:matrix
+setlocal EnableDelayedExpansion
+set "line="
+for /L %%i in (1,1,80) do (
+ set /a r=!random! %% 2
+ set "line=!line!!r! "
+)
+echo !line!
+goto matrix
+`;
+  const blob = new Blob([content], {type:"text/plain"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "MATRIX.bat";
+  a.click();
+}
+
+// Paramètres
+function setVolume(val){
+  document.getElementById('bgMusic').volume = val;
+}
+function setScanSpeed(val){
+  try{
+    document.styleSheets[0].insertRule(`body::before { animation: scan ${val}s infinite; }`, 0);
+  }catch(e){}
+}
+function setTextColor(val){
+  document.body.style.color = val;
+  document.body.style.textShadow = `0 0 5px ${val}`;
+}
+function setMenuOpacity(val){
+  document.querySelector('.container').style.background = `rgba(0,0,0,${val})`;
+}
+</script>
+
+</body>
+</html> 
